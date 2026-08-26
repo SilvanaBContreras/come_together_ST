@@ -1,0 +1,48 @@
+# ============================================================
+# CREDENCIALES
+# ============================================================
+
+.Renviron
+.env
+.env.*
+
+
+# ============================================================
+# ARCHIVOS DE SESIÓN R
+# ============================================================
+
+.Rhistory
+.RData
+.Ruserdata
+
+
+# ============================================================
+# JUPYTER / VS CODE
+# ============================================================
+
+.ipynb_checkpoints/
+
+
+# ============================================================
+# DESCARGAS Y CACHE DE CHARTMETRIC
+# ============================================================
+
+chartmetric_pilotos/
+
+
+# Por seguridad, si estos archivos aparecen fuera de esa carpeta
+chartmetric_raw_long.rds
+chartmetric_raw_responses.rds
+chartmetric_request_log.csv
+
+
+# ============================================================
+# ARCHIVOS TEMPORALES
+# ============================================================
+
+*.tmp
+*.temp
+~$*
+
+# Datos de entrada
+dataset_raw_concat_7000.csv
