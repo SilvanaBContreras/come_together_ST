@@ -1,0 +1,52 @@
+Plan de analisis - TP Series Temporales
+(sintesis operativa, se revisa a medida que crece la muestra)
+
+TAREA BLOQUEANTE (antes de fijar el nucleo definitivo)
+   Terminar la extraccion de playlist_evolution en el notebook principal.
+   Hoy esta en cola pendiente (0% de cobertura en el CSV exportado):
+   correr playlist_work_queue / process_playlist_body para los artistas
+   del piloto, consolidar al MONTHLY_FILE y volver a exportar el CSV wide
+   con esas 10 columnas completas. Hasta que esto no este resuelto, el
+   nucleo y la ventana del punto 1 son provisorios (solo fan_stats).
+
+1. Cobertura conjunta -> nucleo de variables y ventana temporal
+   Estado: PROVISORIO, calculado solo con fan_stats (ver tarea bloqueante).
+   Definido en filtrado_series_exploracion_R.ipynb, seccion 2.
+   Nucleo actual: spotify followers, spotify listeners, instagram followers,
+   youtube channel views, youtube channel subscribers.
+   Se excluyen twitter y tiktok (cobertura baja y pozo nov 2023 a feb 2024).
+   Umbral: 80% de artistas con el nucleo completo simultaneamente
+   (mismo umbral ya usado en el notebook principal, COVERAGE_THRESHOLD).
+   Ventana resultante con 740 artistas (solo fan_stats): abril 2024 a
+   marzo 2026 (24 meses). Se recalcula sola cuando entren mas artistas
+   o mas meses, y hay que recalcularla otra vez cuando playlist_evolution
+   este disponible, porque puede cambiar el nucleo y la ventana.
+
+2. Preprocesamiento
+   Normalizar cada serie artista-variable (log + z-score) para comparar
+   forma y no nivel de popularidad.
+   Separar tendencia de ruido por medio movil o filtro pasa-bajos FFT
+   (ya probado en filtrado_series_exploracion_R.ipynb, con artistas de
+   ejemplo elegidos por tercil de rank y semilla configurable).
+
+3. Representacion por artista
+   Extraer features sobre la serie filtrada de cada variable del nucleo:
+   pendiente de la tendencia, volatilidad del residuo, tasa de
+   crecimiento inicio vs fin, presencia de picos.
+   Armar una tabla artista x features, combinando las variables del nucleo.
+
+4. Clustering
+   Sobre la tabla de features (k-means o jerarquico).
+   Probar mas de una semilla para chequear estabilidad de los clusters.
+
+5. Visualizacion de resultados
+   Small multiples por cluster: trayectorias normalizadas de los
+   artistas de cada cluster, para caracterizar los perfiles digitales
+   (crecimiento sostenido, explosion y caida, estabilidad, etc).
+
+6. Iteracion pendiente
+   Revisar umbral, nucleo y ventana cuando la muestra pase de 740 artistas
+   y cuando playlist_evolution este disponible.
+   Decidir que hacer con twitter y tiktok (imputar, tratar aparte, excluir).
+   Si la ventana comun se estabiliza, evaluar clustering directo de
+   series (DTW multivariado) en vez de clustering por features.

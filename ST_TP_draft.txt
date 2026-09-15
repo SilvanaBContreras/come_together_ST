@@ -1,0 +1,100 @@
+Trabajo práctico final de la materia Series Temporales. De la Maestría en Data Mining de la Facultad de Ciencias Exactas y Naturales de la Universidad de Buenos Aires.
+
+
+DATASET in progress:
+
+Artistas: 739 
+Meses: 63 
+Período: 2021-01-01 a 2026-03-01 
+Variables: 24 
+Filas: 348944 
+Valores NA: 0 (por el formato long. trabajar esto)
+
+cada artista es una trayectoria multivariada,
+
+
+Descripción: 
+El proyecto analiza la evolución temporal de métricas digitales (streaming y redes sociales) de artistas musicales con el objetivo de estudiar si existen perfiles diferenciados en sus trayectorias digitales.
+
+La unidad de análisis es el artista y se utilizan trayectorias mensuales de métricas de plataformas de streaming de música y de redes sociales.
+
+La información se obtiene mediante la API de Chartmetric, plataforma líder global en analítica de datos de la industria de la música.
+
+Pregunta de investigación:
+¿Existen perfiles digitales diferenciados en la trayectoria temporal de los artistas, considerando conjuntamente métricas de streaming y redes sociales?
+
+Motivación: 
+Extender un análisis previo (TFI) basado en perfiles digitales estáticos hacia un enfoque de series temporales.
+en TT1 artistas según una foto multivariada de su presencia digital + vivo. 
+ahora agruparlos según cómo evolucionan esas señales en el tiempo.
+
+Notas: 
+Perfiles potenciales del tipo: crecimiento sostenido, explosión viral y caída, estabilidad, crecimiento primero en redes y luego en streaming, crecimiento simultáneo multiplataforma, estancamiento, etc.
+
+METODOS POSIBLES:
+medidas de similaridad + clustering de series temporales y, eventualmente, algún método de segmentación o descubrimiento de patrones como segundo componente.
+
+Período temporal:
+Se solicitó a la API el período histórico más amplio posible.
+Se analizaron porcentajes de cobertura de datos.
+Se decidió un corte preliminar de inicio en enero 2022 hasta marzo de 2026.
+
+La fecha inicial definitiva del dataset se decidirá a partir del período en el cual la proporción de nulos sea aceptable en función de la cobertura cross-artists. 
+
+Granularidad final:
+Aunque Chartmetric entregue observaciones diarias o con distintas frecuencias según la plataforma, el dataset analítico tendrá una frecuencia mensual.
+Se guardan primero los datos crudos tal como devuelve la API y se mensualiza en una etapa posterior. Para cada artista, variable y mes se tomará como regla inicial el valor correspondiente al último día disponible del mes.
+
+Se conservarán los flags: "interpolated" y "extrapolated" para poder distinguir observaciones reales de valores reconstruidos por la plataforma antes de decidir cómo tratarlos. 
+
+Muestra: 
+600 artistas seleccionados entre los 7.000 top del Chartmetric_Rank, mediante muestreo aleatorio estratificado por deciles (60 artistas por decil).
+Esta muestra se irá incrementando a razón de 140 artistas por día según el límite del plan de extracción obtenido.
+
+Variables: 
+artist_id
+artist_name
+cm_artist_rank
+month
+instagram__followers
+spotify__followers
+spotify__followers_to_listeners_ratio
+spotify__listeners
+spotify__popularity
+tiktok__followers
+tiktok__likes
+twitter__followers
+twitter__retweets
+youtube_artist__daily_views
+youtube_artist__monthly_views
+youtube_channel__subscribers
+youtube_channel__videos
+youtube_channel__views
+amazon__ed_playlist_count
+amazon__playlist_count
+spotify__ed_playlist_count
+spotify__ed_playlist_total_reach
+spotify__playlist_count
+spotify__playlist_total_reach
+youtube__ed_playlist_count
+youtube__ed_playlist_total_reach
+youtube__playlist_count
+youtube__playlist_total_reach
+
+
+-------
+avance 5 minutos
+5 de octubre lunes
+con ppt
+
+VIDEO FINAL:
+
+Estructura sugerida del TP final video ≈15 minutos
+I Carátula (Título, Autores, Filiaciones).
+I Introducción.
+I Hipótesis y Objetivos.
+I Material y Métodos.
+I Resultados.
+I Discusión y conclusiones.
+I Bibliografía.
+I Anexos (optativo)
