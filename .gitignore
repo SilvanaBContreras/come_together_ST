@@ -49,3 +49,4 @@ dataset_raw_concat_7000.csv
 
 #datasets
 *.csv
+*.txt
