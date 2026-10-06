@@ -1,0 +1,198 @@
+---
+title: Procesamiento de Señales
+subtitle: Procesamiento Tiempo-Frecuencia
+author: Dr. Marcelo Risk
+institute: Series Temporales UBA
+date: 2022
+fontsize: 10pt
+output:
+  beamer_presentation:
+    #theme: Singapore
+    #theme: Szeged
+    toc: false
+    number_sections: false
+    slide_level: 2
+    keep_tex: true
+    includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+CompilaMac = FALSE 
+opersys <- version$os
+if(opersys == 'linux-gnu'){
+  CompilaMac = FALSE
+}else{
+  CompilaMac = TRUE
+}
+
+if(CompilaMac == TRUE){
+  directorio = '/Users/marcelorisk/Dropbox/Series_Temporales_2021/'  
+}else{
+  directorio = '/home/marcelo/Dropbox/Series_Temporales_2021/'
+}
+
+setwd(directorio)
+print(directorio)
+```
+
+## Introducción
+
+- La transformada de Fourier permite representar una serie temporal en el dominio de la frecuencia.
+
+- En el DF podemos ver la magnitud de cada componente (frecuencia) con la máxima resolución disponible,
+
+- pero no podemos ver en que tiempo suceden...
+
+- es de interés descomponer una serie temporal de forma de apreciar las componentes frecuenciales y el tiempo en el cual se desarrollan,
+
+- especialmente para series temporales no-estacionarias.
+
+- Solución: representación tiempo-frecuencia.
+
+
+## Algoritmo piramidal de Mallat
+
+![](algoritmo_piramidal.png){#id .class width=100% height=100%}
+
+## Algoritmo piramidal de Mallat: descomposición y reconstrucción
+
+![](RespuestaWavelet.png){#id .class width=100% height=100%}
+
+## Algoritmo piramidal de Mallat: descomposición y reconstrucción
+
+![](decomp_reconst.png){#id .class width=100% height=100%}
+
+## Análisis tiempo-frecuencia: ejemplo con la FC durante 24 hs
+
+![](FiguraWaveletLongTerm.png){#id .class width=45% height=100%} ![](FiguraEspectrosWaveletLongTerm.png){#id .class width=45% height=100%}
+
+
+## Análisis tiempo-frecuencia: paquete wavethresh
+
+```{r ejemplo1, echo = TRUE, fig.height = 3, fig.width = 6, fig.align = "center"}
+
+library(wavethresh)
+
+N = 512
+tiempo = 0:(N-1)
+
+sA = sin(4*2*pi*tiempo/N)
+sA[1:(N/2)] = 0
+sB = sin(24*2*pi*tiempo/N)
+sB[(N/2):N] = 0
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo2, echo = TRUE, fig.height = 2.5, fig.width = 6, fig.align = "center"}
+
+plot(tiempo, sA, type='l', ylab ='sA')
+
+plot(tiempo, sB, type='l', ylab ='sB')
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo2b, echo = TRUE, fig.height = 2.5, fig.width = 6, fig.align = "center"}
+
+sAB = sA + sB
+plot(tiempo, sAB, type='l', ylab ='sAB')
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo3, echo = TRUE, fig.height = 4.5, fig.width = 6, fig.align = "center"}
+
+wd.sA = wd(sA, filter.number = 4, family = "DaubExPhase")
+plot(wd.sA)
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo4, echo = TRUE, fig.height = 4.5, fig.width = 6, fig.align = "center"}
+
+wd.sB = wd(sB, filter.number = 4, family = "DaubExPhase")
+plot(wd.sB)
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo5, echo = TRUE, fig.height = 4.5, fig.width = 6, fig.align = "center"}
+
+wd.sAB = wd(sAB, filter.number = 4, family = "DaubExPhase")
+plot(wd.sAB)
+
+```
+
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo6, echo = TRUE, fig.height = 4, fig.width = 6, fig.align = "center"}
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 8))
+plot.ts(accessD(wd.sAB, level = 8))
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo7, echo = TRUE, fig.height = 4, fig.width = 6, fig.align = "center"}
+
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 7))
+plot.ts(accessD(wd.sAB, level = 7))
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo8, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 6))
+plot.ts(accessD(wd.sAB, level = 6))
+
+```
+
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo9, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 5))
+plot.ts(accessD(wd.sAB, level = 5))
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo10, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 4))
+plot.ts(accessD(wd.sAB, level = 4))
+
+```
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo11, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 3))
+plot.ts(accessD(wd.sAB, level = 3))
+
+```
+
+## Análisis tiempo-frecuencia: serie de tiempo combinada
+
+```{r ejemplo12, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+par(mfrow = c(1, 2))
+plot.ts(accessC(wd.sAB, level = 2))
+plot.ts(accessD(wd.sAB, level = 2))
+
+```
+

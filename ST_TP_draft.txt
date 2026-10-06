@@ -22,7 +22,7 @@ The long and winding road: buscando perfiles de trayectorias de artistas a parti
 El proyecto analiza la evolución temporal de métricas de plataformas de streaming y redes sociales para artistas musicales globales entre marzo de 2022 y marzo de 2026 con el objetivo de identificar perfiles diferenciados en sus trayectorias digitales.
 
 Motivación: 
-Extender una investigación previa que se basada en perfiles digitales estáticos hacia un enfoque de series temporales sobre el mismo conjunto de artistas .
+Extender una investigación previa que se basaba en perfiles digitales estáticos hacia un enfoque de series temporales sobre el mismo conjunto de artistas .
 
 En la investigación anterior, cada artista era una foto multivariada de sus métricas digitales + cantidad de conciertos. 
 
@@ -33,7 +33,10 @@ cada artista es una trayectoria multivariada.
 Pregunta de investigación:
 ¿Existen perfiles digitales diferenciados en la trayectoria temporal de los artistas musicales que se puedan identificar a partir del análisis conjunto de métricas de streaming y redes sociales?
 
-La hipótesis es que, a pesar de la aleatoriedad estructural  definitoria de las industrias culturales, es posible observar perfiles sistemáticos (como podrían ser: crecimiento sostenido, explosión viral y caída, estabilidad, crecimiento primero en redes y luego en streaming, crecimiento simultáneo multiplataforma, estancamiento) a partir de los datos provenientes de las audiencias y presencia de los artistas en plataformas musicales y redes sociales.
+agrupar por forma y después cruzar cada cluster con el nivel. Por ejemplo: ¿la explosión viral se concentra en los deciles bajos? ¿El estancamiento es propio de los artistas consolidados? 
+
+La hipótesis es que, a pesar de la aleatoriedad estructural  definitoria de las industrias culturales, es posible observar perfiles sistemáticos (como podrían ser: crecimiento sostenido, explosión viral y caída, estabilidad, crecimiento simultáneo multiplataforma, estancamiento) a partir de los datos provenientes de las audiencias y presencia de los artistas en plataformas musicales y redes sociales.
+
 
 LOS DATOS:
 
@@ -51,7 +54,7 @@ Muestreo aleatorio estratificado por deciles del ranking de popularidad (cm_arti
 (1041 artistas)
 
 Qué:
-Audiencia en plataformas de música y redes sociales y de presencia en playlists. (24 variables)
+Audiencia en plataformas de música y redes sociales y de presencia en playlists. ( 5 de 24 variables)
 
 Cuándo:
 Marzo 2022 a marzo 2026 (49 meses)
@@ -95,26 +98,152 @@ youtube__ed_playlist_total_reach
 youtube__playlist_count x
 youtube__playlist_total_reach
 
+
+------
+Serie: 1 artista × 1 variable × 49 meses. El panel tiene 1047 × 5 = 5235 series.
+Trayectoria (del artista): las 5 series de un mismo artista juntas. Es la unidad que se va a agrupar en el clustering.
+
+Por el teorema del muestreo, la oscilación más rápida que el panel puede representar dura dos meses (6 ciclos por año); cualquier variación más rápida queda fuera del análisis.
+
+Ed Sheeran (trayectoria consolidada) y Peso Pluma (crecimiento explosivo en 2023) ilustran el problema central: las variables difieren en órdenes de magnitud entre sí y entre artistas, y por eso necesitan una transformación antes de comparar formas.
+-----
+
+
 Criterio selección:
 -artistas: cobertura 80%+ de los meses
 -reducción de redundancia
 -buena cobertura en todos los deciles (sesgada por el ranking, cae del 90% al 60%).
 -meses sin dato quedan explícitos como faltantes.
 
+DIMSENSION DEL PROBLEMA
+1041 series multivariadas, 5 variables, 49 meses. 
 
 METODOS A APLICAR (para revisión):
 -medidas de similaridad + clustering de series temporales 
 -algún método de segmentación o descubrimiento de patrones 
 
+..------
 
+Antes de comparar: transformar las series
+
+Casi todas las variables son stocks acumulados (seguidores, suscriptores)
+Entre artistas, los niveles difieren en varios órdenes de magnitud: de 5 mil a más de 10 millones de seguidores.
+Sin transformar, el clustering agruparía por tamaño y no por forma de la trayectoria.
+
+log1p: duplicar la audiencia suma siempre 0,69, tenga el artista 10 mil o 10 millones de seguidores, así que el crecimiento se compara entre artistas. El +1 cubre los ceros.
+
+Centrado por artista y variable: quita el nivel y deja la forma. Sin centrar, el clustering separaría por popularidad, que ya es el criterio con el que se armó la muestra. El nivel no se pierde: queda en log_valor para caracterizar los grupos después
+
+Viñeta sobre los faltantes (puede ir en la slide de datos):
+
+Faltantes: 0,5% de las celdas del panel, con huecos de 9 meses consecutivos como máximo. Se imputarán antes del análisis.
+
+Preguntas abiertas sobre el método
+
+¿Cómo medir la similitud entre dos trayectorias? ¿Comparando mes a mes, o permitiendo que dos artistas sigan el mismo patrón con desfase temporal (uno "explota" en 2023 y otro en 2025)?
+¿Cómo combinar las cinco variables? ¿Una única medida conjunta por artista, o una por variable que después se integra?
+¿Agrupar las series completas, o resumirlas antes en rasgos (tendencia, volatilidad, momento de mayor crecimiento)?
+¿Cómo identificar cambios bruscos de régimen, como una explosión viral, dentro de cada trayectoria?
 
 -------
 GUION:
 definición de series temporales: señal ocurre a intervalos regulares (chequear)
 llevarlo a un muestreo uniforme.
+En una serie temporal: el tiempo ordena los datos.
+una serie temporal representa una variable en función del tiempo.
+la variable es la cantidad de seguidores de Spotify; el tiempo está registrado en días.
+para un artista Podemos llamar \(x_t\) a la cantidad de seguidores en el día \(t\). 
 
-1424 artistas descargados, 1041
+En un gráfico en el dominio del tiempo:
+- El eje horizontal muestra los días.
+- El eje vertical muestra los seguidores.
+
+Pero una misma trayectoria también puede contener ritmos de variación que cuesta reconocer mirando tantos días juntos. Ahí aparece el dominio de la frecuencia.
+Antes de buscar ritmos, necesitamos separar el total de seguidores del crecimiento diario.
+Otra variable, que podemos calcular a partir de ella, es:
+\[
+\Delta x_t=x_t-x_{t-1}
+\]
+Eso significa:
+Cambio diario = seguidores de hoy − seguidores de ayer.
+El patrón semanal resulta mucho más visible en el crecimiento diario.
+una oscilación puede estar en la velocidad de crecimiento de la audiencia, aunque el total de seguidores nunca baje.
+Un ciclo es una vuelta completa de un patrón.
+El tiempo que tarda en completarse se llama período.
+
+La frecuencia expresa cuántas vueltas ocurren por unidad de tiempo.Un patrón semanal (ritmo semanal) tiene mayor frecuencia que uno anual: completa muchas más vueltas durante el mismo período de observación. y lo medimos como 1 sobre período. por ej un patron semanal 1/7 es mayor que un patron mensual 1/30. quiere decir que en una unidad de tiempo (el día) completa más ciclos (aunque en realidad en un día no completa ninguno):
+
+
+Frecuencia de muestreo: cada cuánto registrás los datos.
+
+La amplitud expresa el tamaño de la oscilación. se mide desde el centro hasta un extremo (no de máximo a mínimo)
+
+Dos artistas podrían compartir un ritmo semanal y tener amplitudes muy diferentes: uno con oscilaciones pequeñas y otro con variaciones enormes. Compartir frecuencia no significa compartir intensidad.
+Tampoco el artista con más seguidores tiene necesariamente la mayor oscilación: el tamaño de su audiencia y el tamaño de sus variaciones son características distintas.
+El dominio de la frecuencia permite preguntar qué ritmos contribuyen a la trayectoria.
+el tiempo muestra cuándo ocurren los cambios; la frecuencia ayuda a examinar sus ritmos
+
+FOURIER:
+conocés la trayectoria de seguidores, pero no conocés todos los procesos que la generaron.
+Podrían intervenir lanzamientos, exposición en playlists, campañas, cambios en la actividad del artista o problemas de registro. Fourier no identifica directamente esas causas. Describe las variaciones mediante componentes matemáticas.
+
+En el gráfico temporal, todo aparece mezclado en una sola curva. Fourier permite examinar cuánto contribuye cada frecuencia.
+Pero descomponer matemáticamente una trayectoria no equivale a descubrir sus causas.
+
+Para cada frecuencia, calcula cuánto contribuye esa oscilación a representar la serie.
+La comparación considera también su posición temporal. Una onda que alcanza su máximo los lunes no está alineada igual que otra que alcanza su máximo los viernes.
+
+Si existen dos artistas con una variación semanal (frecuencia, cada cuanto completa una oscilación) del crecimiento, de igual amplitud (misma intensidad, magnitud). Uno alcanza su máximo los lunes y otro los jueves. La direrencia es la FASE. Está en fourier pero no se ve si sólo miramod el módulo.
+
+ESPECTRO
+El espectro muestra contribuciones por frecuencia
+Al gráfico de esas contribuciones lo llamamos espectro.
+En un espectro de amplitud:
+- El eje horizontal muestra frecuencias.
+- El eje vertical muestra magnitudes relacionadas con la amplitud de las componentes.
+Un pico indica que una frecuencia contribuye especialmente a representar la serie.
+
+
+En el ejemplo semanal, el pico tiene una altura de 80 seguidores por día. Esa es la amplitud de la oscilación que construimos.
+La ganancia diaria combina:
+Un nivel promedio de 200 seguidores por día, más una oscilación semanal de amplitud 80 seguidores por día.
+
+Por lo tanto, la lectura conjunta del pico es:
+“Hay una componente que se repite cada siete días y hace fluctuar la ganancia diaria con una amplitud de 80 seguidores por día”.
+
+La posición horizontal informa el ritmo. La altura informa el tamaño de esa oscilación.
+El promedio de 200 no aparece en este espectro porque, antes de calcularlo, resté el promedio. Así pudimos observar las fluctuaciones alrededor de ese nivel.
+
+ENERGIA
+¿Cuánto pesa cada componente dentro de la serie que estamos analizando?
+Esta energía mide la magnitud acumulada de las desviaciones en la ventana analizada. Por sí sola, todavía no dice si se produjeron siguiendo un ritmo semanal, lentamente o mediante eventos aislados.
+Por eso, tener mucha energía en el total de seguidores no implica tener una audiencia especialmente fluctuante.
+Un artista con millones de seguidores puede tener una energía enorme en su serie original aunque su audiencia cambie muy poco. Los valores elevados, al cuadrado, dominan el cálculo.
+
+Parseval permite calcular la misma energía mirando las frecuencias
+Fourier reparte entre frecuencias la energía de la misma serie.
+
+Amplitud y energía están relacionadas, pero no son iguales
+podemos ver cuánto contribuyen las energías de cada componente alas fluctuaciones observadas.
+
+importancia de la compoente de frecuencia 0: Un espectro calculado sobre los valores originales puede estar dominado por el nivel medio. Después de restarlo, podemos examinar cómo se distribuye la energía de las desviaciones respecto de ese nivel.
+-----
+-----
 cada artista es una trayectoria multivariada.
+
+TEOREMA: Δt = 1 mes, entonces la frecuencia de muestreo es 12 muestras por año.
+El teorema exige que esa frecuencia sea al menos el doble de la frecuencia máxima del fenómeno. Por lo tanto, el panel no pierde información si nada de lo que importa varía más rápido que 6 veces por año, es decir, ningún cambio relevante dura menos de 2 meses.
+La frecuencia máxima del dispositivo: Chartmetric registra una vez por día. Eso ya pone un techo: nada de lo que pase dentro de un mismo día queda registrado. Nosotros tomamos además 1 de cada ~30 días.
+¿Lo respetás? En sentido estricto no del todo, y eso está bien siempre que lo argumentes, que es lo que hace la sección 3 del notebook:
+
+El fenómeno que te interesa es lento. La pregunta es por perfiles de trayectoria en 4 años (crecer, explotar, estancarse), cambios que duran meses o años. Están muy por debajo del límite de 6 ciclos por año.
+Lo medimos. Con los datos diarios de 124 artistas, en la serie típica apenas ~1% de la variación está por encima del límite. Y el último día del mes difiere del promedio del mes en menos de 0,5%: casi no se pierde nada al quedarnos con un dato por mes.
+Lo que sí viola el teorema son errores de la fuente que duran pocos días. Cuando uno cae justo el último día del mes, reaparece como un pico mensual falso. Es el aliasing que predice la teoría, y lo vemos en Sia: un error de días en junio de 2025 se convirtió en "109 seguidores". Esos picos se detectan y se corrigen en el paso siguiente.
+El muestreo en amplitud también aparece en tus datos, y es un buen ejemplo para el video. Los suscriptores de YouTube vienen redondeados a 3 cifras significativas: el 60% de los valores, contra menos del 1% en las otras variables. Ed Sheeran figura con 51.400.000, 51.700.000, 51.900.000. Ese es el Δx del profesor: con 50 millones de suscriptores el escalón es de 100 mil. Pero en escala log eso es 0,2%, por debajo del crecimiento mensual típico (0,6%), así que no borra la forma de la trayectoria. Las otras variables son conteos exactos: Δx = 1.
+
+Versión para el video (unos 30 segundos):
+
+"Los datos son mensuales: una muestra por mes, 12 por año. Por el teorema del muestreo, eso solo representa bien cambios que duran más de dos meses. Como buscamos perfiles de trayectoria en cuatro años, nos alcanza, y lo verificamos con datos diarios: menos del 2% de la variación ocurre por encima de ese límite. Lo que lo viola son errores de la fuente de pocos días, que al muestrear reaparecen como picos falsos, el aliasing de la teoría. Por eso los detectamos y corregimos antes del análisis."
 
 
 -------
@@ -161,3 +290,105 @@ Artistas (1041 de 1424 dentro del marco top 5000)
 
 Datos en al menos el 80% de los meses (40 de 49, entre marzo de 2022 y marzo de 2026) en cada una de las cinco variables.
 El panel conserva el sesgo de la fuente: la retención cae del 90% en el decil superior al 60% en el inferior (de 122 a 78 artistas). Todavía no se submuestreó para equiparar los deciles: con el mínimo actual, un panel balanceado tendría 780 artistas.
+----
+
+entre el 87% y el 99% de las series de audiencia no son estacionarias, como se espera de algo que crece. La primera diferencia mejora esa proporción pero no la elimina: la propia tasa de crecimiento se acelera o se frena. Ese es el argumento para comparar formas de trayectoria en lugar de hacer pronósticos.
+
+----
+lectura graáfico prepro espectro
+
+Las frecuencias te sonaban distintas por esto: él grafica contra el índice de la FFT, y yo convertí ese índice a ciclos por año (índice × 12 / 49 meses).
+
+prepro_06: espectro de amplitud
+Qué es. La FFT descompone cada serie de 49 meses en ondas de distinta velocidad. Cada barra dice cuánto pesa una onda:
+
+A la izquierda están las lentas: 0,25 ciclos por año es una onda de 48 meses.
+A la derecha está la más rápida que puede verse con un dato por mes: 6 ciclos por año, una onda de 2 meses. Ese es el límite de Nyquist.
+En cada barra se ven dos cosas: en gris, la serie transformada; en azul, la misma serie después de la media móvil de 3 meses.
+
+Qué muestra.
+
+Arriba, seguidores en Spotify. Casi toda la amplitud está en las primeras barras. Son trayectorias lentas, y la media móvil casi no las toca: el azul tapa al gris.
+Abajo, playlists en YouTube. Hay mucha amplitud en frecuencias altas, que es ruido mes a mes (Megadeth es el caso extremo). Ahí el azul queda muy por debajo del gris, es decir que el suavizado sacó ese ruido.
+La tabla de la celda siguiente lo confirma en todo el panel:
+
+En las variables de audiencia, entre el 90 % y el 94 % de la energía está por debajo de 1 ciclo por año.
+En playlists de YouTube, el 17,5 % está en frecuencias rápidas, y la media móvil lo baja al 2,9 %.
+Cómo aporta al preprocesamiento. Justifica el suavizado: muestra que la media móvil saca ruido donde lo hay (playlists) y no deforma las series que ya eran limpias (seguidores).
+
+Por qué se resta la tendencia. La FFT supone que la serie se repite, y una serie que crece tiene un salto entre el último mes y el primero. Ese salto ensucia todas las frecuencias y taparía todo lo demás.
+
+//// AGREGAR ANTES DE CLUST
+D. Equilibraría el peso de las cinco variables
+Aunque todas estén en logaritmos, una variable puede fluctuar mucho más que otra y dominar la distancia entre artistas.
+Si queremos un peso inicial comparable por plataforma, usaría una escala común por variable:
+\[
+z_{ivt}=\frac{c_{ivt}}{s_v}
+\]
+Aquí \(s_v\) se calcula utilizando los valores centrados de esa variable en el conjunto de artistas y meses.
+
+///mensualización
+La representación mensual permite estudiar trayectorias de mediano plazo, pierde detalle intramensual y puede presentar aliasing que afecte la interpretación de algunas variaciones lentas.
+
+
+
+Pensemos cada serie como una suma de ondas lentas y rápidas
+Una media móvil es un filtro: deja pasar las ondas lentas y borra las rápidas. 
+
+la de 3 meses conserva los cambios de más de medio año y borra el ruido mes a mes;
+la de 12 solo deja la tendencia de años.
+/// el mismo suavizado hecho con FFT sobre TINI: sale bien solo si antes quitamos la tendencia, porque la FFT trata la serie como si se repitiera. Por eso la media móvil es nuestro filtro principal.
+
+"Trabajamos con la media móvil de 3 meses: limpia el ruido mensual sin deformar la trayectoria. El pasa-bajos FFT llega a un resultado similar, pero exige quitar antes la tendencia; lo usamos solo como control."
+
+/////////////
+propuesta B
+
+OBJETIVO: describir el ritmo semanal del crecimiento diario de seguidores en Spotify
+y compararlo entre grupos de artistas.
+
+1. Recorte
+   - Variable: seguidores de Spotify, frecuencia diaria.
+   - Período: 01/01/2022 a 31/03/2026.
+   - Artistas: al menos 90 % de días observados.
+
+2. Control de calidad de la fuente
+   - Marcar los días interpolados por Chartmetric (campo is_interpolated).
+   - Marcar los días con valor repetido (sin actualización).
+   - Detectar caídas o saltos imposibles (error de la fuente) con el mismo criterio
+     del panel mensual.
+
+3. Muestreo uniforme e imputación (clase 06)
+   - Completar el calendario diario.
+   - Interpolación lineal sobre log1p en los huecos cortos.
+   - Conservar la marca de día imputado.
+
+4. Transformación
+   - log1p de los seguidores.
+   - Crecimiento diario = diferencia de log1p entre días consecutivos
+     (cambio porcentual de un día al otro).
+
+5. Detección de periodicidad (clase 05)
+   - Autocorrelación (acf) del crecimiento diario, retardos 1 a 28.
+   - Observar el retardo 7 frente a los demás.
+
+6. Perfil semanal
+   - Crecimiento medio por día de la semana, por artista.
+   - Expresado relativo al crecimiento medio de cada artista, para comparar
+     artistas de distinto tamaño.
+
+7. Separación del ciclo (clase 03)
+   - Media móvil centrada de 7 días como crecimiento de fondo.
+   - Componente semanal = crecimiento diario menos media móvil de 7 días.
+
+8. Estacionaridad (clase 10, opcional)
+   - ADF y KPSS sobre el crecimiento diario.
+
+9. Comparación entre grupos
+   - Por decil de popularidad y por variables de metadata.
+   - Tabla de perfiles semanales; Kruskal-Wallis para comparar grupos.
+
+10. Robustez
+   - Repetir excluyendo los días interpolados por Chartmetric.
+   - Repetir por período (2022-2023 y 2025-2026), porque la calidad de la fuente cambia.
+
