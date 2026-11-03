@@ -50,3 +50,17 @@ dataset_raw_concat_7000.csv
 #datasets
 *.csv
 *.txt
+
+# ============================================================
+# RECURSOS GRAFICOS PARA PRESENTACIONES (no son figuras del codigo)
+# ============================================================
+
+imagenes_estética/
+
+
+# ============================================================
+# SALIDAS CON REGISTROS DE CHARTMETRIC (licencia: no se comparten)
+# Los notebooks se suben sin salidas (ver .gitattributes).
+# ============================================================
+
+*.rds
