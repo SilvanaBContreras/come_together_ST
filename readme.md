@@ -18,7 +18,8 @@ Se corren en orden. Todos usan R (kernel `ir`) con `data.table`.
 |---|---|---|
 | `01_CT_ST_extraccion_API.ipynb` | Selección de la muestra por deciles de popularidad, extracción de Fan Stats y Playlist Evolution desde la API de Chartmetric, mensualización (último valor del mes) y consolidación. | Dataset mensual crudo `artistas_ST_raw_<n>_long.csv` / `_wide.csv` |
 | `02_CT_ST_construccion_dataset.ipynb` | Cobertura por variable, cobertura conjunta (con el diagnóstico del pozo de Twitter), elección de variables y armado del panel con NA explícitos. | Panel `artistas_ST_<n>de<m>_top5000_22_26_na_long.csv` / `_wide.csv` |
-| `03_CT_ST_preprocesamiento_filtros.ipynb` | Validación del muestreo mensual, interpolación de faltantes, transformación, suavizado con media móvil y filtro pasa-bajos FFT. | Panel preprocesado |
+| `03_CT_ST_preprocesamiento_filtros.ipynb` | Validación del muestreo mensual, limpieza de picos y series anómalas, interpolación de faltantes, transformación, suavizado con media móvil y filtro pasa-bajos FFT, features por artista. | Panel preprocesado y tabla de features |
+| `04_CT_ST_clustering.ipynb` | Clustering de trayectorias por etapas. Etapa 1: matrices de distancia euclídea, DTW y SBD. | Matrices de distancia (local) |
 
 El notebook 01 tiene el interruptor `EJECUTAR_EXTRACCION_API` (sección 1). Con `FALSE` (valor por defecto) corre completo desde el cache local, sin hacer requests a la API.
 
