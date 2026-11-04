@@ -21,7 +21,17 @@ Se corren en orden. Todos usan R (kernel `ir`) con `data.table`.
 | `03_CT_ST_preprocesamiento_filtros.ipynb` | Validación del muestreo mensual, limpieza de picos y series anómalas, interpolación de faltantes, transformación, suavizado con media móvil y filtro pasa-bajos FFT, features por artista. | Panel preprocesado y tabla de features |
 | `04_CT_ST_clustering_distancias.ipynb` | Clustering de trayectorias por etapas. Etapa 1: matrices de distancia euclídea, DTW y SBD. | Matrices de distancia (local) |
 | `05_CT_ST_clustering_particiones.ipynb` | Etapas 2 y 3: jerárquico (Ward), spectral y PAM sobre las tres matrices, k de 2 a 8, tamaños y elección de k por lectura de perfiles. | Particiones e indicadores (local) |
-| `06_CT_ST_forma_crecimiento.ipynb` | Segunda representación: la tasa de crecimiento mensual de las tres audiencias. Etapa 1: distancias euclídea y DTW. | Matrices de distancia (local) |
+| `06_CT_ST_forma_crecimiento.ipynb` | Segunda representación: la tasa de crecimiento mensual centrada de las tres audiencias. Distancias euclídea y DTW, spectral y PAM, elección de k. | Particiones de la forma (local) |
+| `07_CT_ST_validacion_perfiles.ipynb` | Estabilidad (semillas y remuestreo), control por decil de popularidad, cruce de intensidad y forma, caracterización y artistas representativos. | Perfil de cada artista (local) |
+
+### El camino del análisis
+
+Cada notebook responde una pregunta y su respuesta abre la siguiente:
+
+1. **01-03:** ¿cómo construir trayectorias mensuales comparables y limpias? Panel de 1252 artistas, 5 variables, 49 meses.
+2. **04-05:** ¿hay perfiles de trayectoria? Sí, pero ordenan por *cuánto* crece cada artista: la tendencia tapa la forma.
+3. **06:** entonces, ¿*cómo* crecen? Con la tasa de crecimiento centrada aparecen formas (parejos, enfriamiento) y DTW empieza a importar.
+4. **07:** ¿son perfiles estables y no la popularidad disfrazada? ¿Cómo se combinan cuánto y cómo crecen?
 
 El notebook 01 tiene el interruptor `EJECUTAR_EXTRACCION_API` (sección 1). Con `FALSE` (valor por defecto) corre completo desde el cache local, sin hacer requests a la API.
 
