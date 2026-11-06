@@ -1,9 +1,6 @@
 # The Long and Winding Road - Series Temporales
 Autora: Silvana Contreras
 
-Trabajo práctico final de la materia **Data Mining de Series Temporales**.
-Maestría en Data Mining, Facultad de Ciencias Exactas y Naturales, Universidad de Buenos Aires.
-
 **The Long and Winding Road (LWR)**: búsqueda de perfiles en las trayectorias digitales de artistas musicales entre marzo de 2022 y marzo de 2026, a partir de métricas de streaming y redes sociales de la API de Chartmetric.
 
 ## Objetivo
@@ -61,3 +58,8 @@ git config filter.limpiar-salidas.clean "jupyter nbconvert --ClearOutputPreproce
 git config filter.limpiar-salidas.smudge cat
 git config filter.limpiar-salidas.required true
 ```
+
+---
+
+Trabajo práctico final de la materia **Data Mining de Series Temporales**.
+Maestría en Data Mining, Facultad de Ciencias Exactas y Naturales, Universidad de Buenos Aires.
