@@ -1,37 +1,46 @@
-# Come Together - Series Temporales
+# The Long and Winding Road - Series Temporales
 Autora: Silvana Contreras
 
 Trabajo práctico final de la materia **Data Mining de Series Temporales**.
 Maestría en Data Mining, Facultad de Ciencias Exactas y Naturales, Universidad de Buenos Aires.
 
-**The long and winding road**: búsqueda de perfiles en las trayectorias digitales de artistas musicales entre marzo de 2022 y marzo de 2026, a partir de métricas de streaming y redes sociales de la API de Chartmetric.
+**The Long and Winding Road (LWR)**: búsqueda de perfiles en las trayectorias digitales de artistas musicales entre marzo de 2022 y marzo de 2026, a partir de métricas de streaming y redes sociales de la API de Chartmetric.
 
 ## Objetivo
 
-Extender un análisis previo basado en perfiles digitales estáticos hacia un enfoque de series temporales. La unidad de análisis es el artista: cada artista es una trayectoria mensual multivariada.
+Extender **Come Together**, la investigación previa sobre los mismos artistas, que tuvo un enfoque sincrónico: cada artista era una foto de sus métricas digitales. LWR agrega el tiempo: la unidad de análisis es el artista y cada artista es una trayectoria mensual multivariada.
 
 ## Notebooks
 
-Se corren en orden. Todos usan R (kernel `ir`) con `data.table`.
+Se corren en orden. Todos usan R (kernel `ir`) con `data.table`. Cada notebook responde una pregunta y su respuesta abre la siguiente.
 
-| Notebook | Qué hace | Salida principal |
-|---|---|---|
-| `01_CT_ST_extraccion_API.ipynb` | Selección de la muestra por deciles de popularidad, extracción de Fan Stats y Playlist Evolution desde la API de Chartmetric, mensualización (último valor del mes) y consolidación. | Dataset mensual crudo `artistas_ST_raw_<n>_long.csv` / `_wide.csv` |
-| `02_CT_ST_construccion_dataset.ipynb` | Cobertura por variable, cobertura conjunta (con el diagnóstico del pozo de Twitter), elección de variables y armado del panel con NA explícitos. | Panel `artistas_ST_<n>de<m>_top5000_22_26_na_long.csv` / `_wide.csv` |
-| `03_CT_ST_preprocesamiento_filtros.ipynb` | Validación del muestreo mensual, limpieza de picos y series anómalas, interpolación de faltantes, transformación, suavizado con media móvil y filtro pasa-bajos FFT, features por artista. | Panel preprocesado y tabla de features |
-| `04_CT_ST_clustering_distancias.ipynb` | Clustering de trayectorias por etapas. Etapa 1: matrices de distancia euclídea, DTW y SBD. | Matrices de distancia (local) |
-| `05_CT_ST_clustering_particiones.ipynb` | Etapas 2 y 3: jerárquico (Ward), spectral y PAM sobre las tres matrices, k de 2 a 8, tamaños y elección de k por lectura de perfiles. | Particiones e indicadores (local) |
-| `06_CT_ST_forma_crecimiento.ipynb` | Segunda representación: la tasa de crecimiento mensual centrada de las tres audiencias. Distancias euclídea y DTW, spectral y PAM, elección de k. | Particiones de la forma (local) |
-| `07_CT_ST_validacion_perfiles.ipynb` | Estabilidad (semillas y remuestreo), control por decil de popularidad, cruce de intensidad y forma, caracterización y artistas representativos. | Perfil de cada artista (local) |
+**01 · `01_LWR_ST_extraccion_API.ipynb`**
+- ¿Cómo construir trayectorias mensuales si no existe un dataset público? Muestra estratificada por deciles de popularidad, extracción de Fan Stats y Playlist Evolution desde Chartmetric, mensualización (último valor del mes) y consolidación.
+- *Salida:* dataset mensual crudo `artistas_ST_raw_<n>_long.csv` / `_wide.csv`.
 
-### El camino del análisis
+**02 · `02_LWR_ST_construccion_dataset.ipynb`**
+- ¿Qué artistas, variables y meses permiten comparar a todos? Cobertura por variable y conjunta (con el diagnóstico del pozo de Twitter), elección de 5 variables y panel de 49 meses con NA explícitos.
+- *Salida:* panel `artistas_ST_<n>de<m>_top5000_22_26_na_long.csv` / `_wide.csv`.
 
-Cada notebook responde una pregunta y su respuesta abre la siguiente:
+**03 · `03_LWR_ST_preprocesamiento_filtros.ipynb`**
+- ¿Las series miden a los artistas o a la fuente? Validación del muestreo mensual, limpieza de picos y series anómalas, interpolación, transformación log1p, suavizado (media móvil y pasa-bajos FFT), crecimiento mensual y features por artista.
+- *Salida:* panel preprocesado (1252 artistas) y tabla de features.
 
-1. **01-03:** ¿cómo construir trayectorias mensuales comparables y limpias? Panel de 1252 artistas, 5 variables, 49 meses.
-2. **04-05:** ¿hay perfiles de trayectoria? Sí, pero ordenan por *cuánto* crece cada artista: la tendencia tapa la forma.
-3. **06:** entonces, ¿*cómo* crecen? Con la tasa de crecimiento centrada aparecen formas (parejos, enfriamiento) y DTW empieza a importar.
-4. **07:** ¿son perfiles estables y no la popularidad disfrazada? ¿Cómo se combinan cuánto y cómo crecen?
+**04 · `04_LWR_ST_clustering_distancias.ipynb`**
+- ¿Cómo medir cuánto se parecen dos trayectorias? Matrices de distancia euclídea, DTW y SBD sobre el nivel.
+- *Salida:* matrices de distancia (local).
+
+**05 · `05_LWR_ST_clustering_particiones.ipynb`**
+- ¿Hay perfiles de trayectoria? Jerárquico, spectral y PAM, k de 2 a 8 y elección de k por lectura de perfiles. Resultado: tres perfiles que ordenan por *cuánto* crece cada artista; la tendencia tapa la forma.
+- *Salida:* particiones e indicadores (local).
+
+**06 · `06_LWR_ST_forma_crecimiento.ipynb`**
+- Entonces, ¿*cómo* crecen? Segunda representación: la tasa de crecimiento centrada de las tres audiencias. Distancias, spectral y PAM, elección de k. Aparecen formas (parejos, enfriamiento) y DTW empieza a importar.
+- *Salida:* particiones de la forma (local).
+
+**07 · `07_LWR_ST_validacion_perfiles.ipynb`**
+- ¿Son perfiles estables y no la popularidad disfrazada? ¿Cómo se combinan cuánto y cómo crecen? Estabilidad con semillas y remuestreo, control por decil, cruce de intensidad y forma, caracterización y artistas representativos.
+- *Salida:* perfil de cada artista (local).
 
 El notebook 01 tiene el interruptor `EJECUTAR_EXTRACCION_API` (sección 1). Con `FALSE` (valor por defecto) corre completo desde el cache local, sin hacer requests a la API.
 
